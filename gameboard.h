@@ -27,7 +27,7 @@ void bgCouleur(const unsigned &coul);
 void showMatrix1(const vector<vector<char>> &Mat);
 void showMatrix2(const vector<vector<char>> &Mat);
 
-void initMat(vector<vector<char>> &Mat, unsigned nLevel, CPosition &posPlayer1, CPosition &posPlayer2);
+void initMat(vector<vector<char>> &Mat, CPosition &posPlayer1, CPosition &posPlayer2);
 void moveToken(vector<vector<char>> &Mat, char move, CPosition &pos);
 
 int ppal();

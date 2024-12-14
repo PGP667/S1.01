@@ -9,3 +9,6 @@ SOURCES += \
 
 HEADERS += \
     gameboard.h
+
+DISTFILES += \
+    nLevel0

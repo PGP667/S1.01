@@ -2,6 +2,8 @@
 #include <iostream>
 #include <vector>
 #include <limits>
+#include <fstream>
+#include <unistd.h>
 
 using namespace std;
 
@@ -93,6 +95,44 @@ void showMatrix2(const vector<vector<char>> &Mat) {
     cout << endl;
 }
 
+void printCurrentDirectory() {
+    char cwd[PATH_MAX];
+    if (getcwd(cwd, sizeof(cwd)) != nullptr) {
+        cout << "Répertoire courant : " << cwd << endl;
+    } else {
+        cerr << "Erreur : Impossible de récupérer le répertoire courant." << endl;
+    }
+}
+
+void loadLevelFromFile(const string &filename, vector<vector<char>> &Mat) {
+    ifstream file(filename);
+    if (!file.is_open()) {
+        cerr << "Erreur : Impossible d'ouvrir le fichier " << filename << endl;
+        exit(EXIT_FAILURE);
+    }
+
+    Mat.clear();
+    string line;
+    while (getline(file, line)) {
+        vector<char> row(line.begin(), line.end());
+        Mat.push_back(row);
+    }
+
+    file.close();
+}
+
+void initMat(vector<vector<char>> &Mat, /*unsigned nLevel,*/ CPosition &posPlayer1, CPosition &posPlayer2) {
+    string filename = "levels/nLevel0.txt";
+    loadLevelFromFile(filename, Mat);
+
+    Mat[23][13] = kTokenPlayer1;
+    posPlayer1 = CPosition(13, 23);
+
+    Mat[20][20] = kTokenPlayer2;
+    posPlayer2 = CPosition(20, 20);
+}
+
+/*
 void initMat (vector <vector<char>> & Mat, unsigned nLevel, CPosition & posPlayer1,
              CPosition & posPlayer2)
 {
@@ -136,7 +176,7 @@ void initMat (vector <vector<char>> & Mat, unsigned nLevel, CPosition & posPlaye
     Mat[20][20] = kTokenPlayer2;
     posPlayer2 = CPosition(20,20);
 }
-
+*/
 void moveToken(vector<vector<char>> &Mat, char move, CPosition &pos) {
     short x = 0, y = 0;
     char kToken = Mat[pos.second][pos.first];
@@ -177,7 +217,7 @@ int ppal ()
     vector <vector<char>> Mat;
     CPosition posPlayer1, posPlayer2;
 
-    initMat(Mat, 1, posPlayer1, posPlayer2);
+    initMat(Mat, /*1,*/ posPlayer1, posPlayer2);
     showMatrix2(Mat);
 
     while (posPlayer1 != posPlayer2){
@@ -203,6 +243,7 @@ int ppal ()
 
 int gameBoard()
 {
+    printCurrentDirectory();
     ppal();
     return 0;
 }
