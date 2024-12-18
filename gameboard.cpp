@@ -2,8 +2,8 @@
 #include <iostream>
 #include <vector>
 #include <limits>
-#include <fstream>
-#include <unistd.h>
+#include <stdlib.h>
+#include <time.h>
 
 using namespace std;
 
@@ -19,148 +19,87 @@ void bgCouleur (const unsigned & coul) {
     cout << "\033[" << coul + 10 <<"m";
 }
 
-void showMatrix1 (const vector <vector<char>> & Mat){
+void showMatrix (const vector <vector<char>> & Mat){
     clearScreen();
     couleur(KReset);
-    bgCouleur(KVert);
-    for (size_t i = 0; i < Mat[0].size()*2 + 1; ++i)
-        cout << ' ';
-    couleur(KReset);
-    cout << endl;
     for (size_t y = 0; y < Mat.size(); ++y) {
-        bgCouleur(KVert);
-        cout << ' ';
-        couleur(KReset);
         for (size_t x = 0; x < Mat[y].size(); ++x){
-            if (Mat[y][x] == kTokenPlayer1){
+            switch (Mat[y][x]){
+            case (KTokenPacman):
                 couleur(KJaune);
-                cout << kTokenPlayer1;
-            }
-            else if (Mat[y][x] == kTokenPlayer2){
+                cout << KTokenPacman;
+                break;
+            case (KTokenGhost):
                 couleur(KBleu);
-                cout << kTokenPlayer2;
+                cout << KTokenGhost;
+                break;
+            case (KTokenRedGhost):
+                couleur(KRouge);
+                cout << KTokenGhost;
+                break;
+            case (KTokenPinkGhost):
+                couleur(KMagenta);
+                cout << KTokenGhost;
+                break;
+            case (KTokenBlueGhost):
+                couleur(KCyan);
+                cout << KTokenGhost;
+                break;
+            case (KTokenOrangeGhost):
+                couleur(KJaune);
+                cout << KTokenGhost;
+                break;
+            case (KWall):
+                bgCouleur(KVert);
+                cout << ' ';
+                break;
+            case (KDot):
+                couleur(KJaune);
+                cout << KDot;
+                break;
+            case (KGum):
+                couleur(KJaune);
+                cout << KGum;
+                break;
+            default :
+                cout << ' ';
+                break;
             }
-            else {
-                cout << kEmpty;
-            }
-            bgCouleur(KVert);
-            cout << ' ';
             couleur(KReset);
         }
         cout << endl;
-        bgCouleur(KVert);
-        for (size_t i = 0; i < Mat[y].size()*2 + 1; ++i)
-            cout << ' ';
-        couleur(KReset);
-        cout << endl;
     }
-}
-
-void showMatrix2(const vector<vector<char>> &Mat) {
-    clearScreen();
-    couleur(KReset);
-    // bgCouleur(KVert); // Commenté pour supprimer la bordure
-    // for (size_t i = 0; i < Mat[0].size() + 2; ++i)
-    //     cout << ' ';
-    couleur(KReset);
-    cout << endl;
-    for (size_t y = 0; y < Mat.size(); ++y) {
-        // bgCouleur(KVert); // Commenté pour supprimer la bordure
-        // cout << ' ';
-        couleur(KReset);
-        for (size_t x = 0; x < Mat[y].size(); ++x) {
-            if (Mat[y][x] == kTokenPlayer1) {
-                couleur(KJaune);
-                cout << kTokenPlayer1;
-            } else if (Mat[y][x] == kTokenPlayer2) {
-                couleur(KBleu);
-                cout << kTokenPlayer2;
-            } else if (Mat[y][x] == kWall) {
-                bgCouleur(KVert); // Commenté pour supprimer la bordure
-                cout << ' ';
-                couleur(KReset);
-            } else {
-                cout << ' ';
-            }
-        }
-        // bgCouleur(KVert); // Commenté pour supprimer la bordure
-        // cout << ' ';
-        couleur(KReset);
-        cout << endl;
-    }
-    // bgCouleur(KVert); // Commenté pour supprimer la bordure
-    // for (size_t i = 0; i < Mat[0].size() + 2; ++i)
-    //     cout << ' ';
-    couleur(KReset);
     cout << endl;
 }
 
-void printCurrentDirectory() {
-    char cwd[PATH_MAX];
-    if (getcwd(cwd, sizeof(cwd)) != nullptr) {
-        cout << "Répertoire courant : " << cwd << endl;
-    } else {
-        cerr << "Erreur : Impossible de récupérer le répertoire courant." << endl;
-    }
-}
-
-void loadLevelFromFile(const string &filename, vector<vector<char>> &Mat) {
-    ifstream file(filename);
-    if (!file.is_open()) {
-        cerr << "Erreur : Impossible d'ouvrir le fichier " << filename << endl;
-        exit(EXIT_FAILURE);
-    }
-
-    Mat.clear();
-    string line;
-    while (getline(file, line)) {
-        vector<char> row(line.begin(), line.end());
-        Mat.push_back(row);
-    }
-
-    file.close();
-}
-
-void initMat(vector<vector<char>> &Mat, /*unsigned nLevel,*/ CPosition &posPlayer1, CPosition &posPlayer2) {
-    string filename = "levels/nLevel0.txt";
-    loadLevelFromFile(filename, Mat);
-
-    Mat[23][13] = kTokenPlayer1;
-    posPlayer1 = CPosition(13, 23);
-
-    Mat[20][20] = kTokenPlayer2;
-    posPlayer2 = CPosition(20, 20);
-}
-
-/*
-void initMat (vector <vector<char>> & Mat, unsigned nLevel, CPosition & posPlayer1,
-             CPosition & posPlayer2)
+void initMat (vector <vector<char>> & Mat, unsigned nLevel, CPosition & posPlayer,
+             CDirection & dirPlayer, vector<ghost> & ghosts)
 {
     Mat = {
            {'#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#'},
            {'#','.','.','.','.','.','.','.','.','.','.','.','.','#','#','.','.','.','.','.','.','.','.','.','.','.','.','#'},
            {'#','.','#','#','#','#','.','#','#','#','#','#','.','#','#','.','#','#','#','#','#','.','#','#','#','#','.','#'},
-           {'#','.','#','#','#','#','.','#','#','#','#','#','.','#','#','.','#','#','#','#','#','.','#','#','#','#','.','#'},
+           {'#','o','#','#','#','#','.','#','#','#','#','#','.','#','#','.','#','#','#','#','#','.','#','#','#','#','o','#'},
            {'#','.','#','#','#','#','.','#','#','#','#','#','.','#','#','.','#','#','#','#','#','.','#','#','#','#','.','#'},
            {'#','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','#'},
            {'#','.','#','#','#','#','.','#','#','.','#','#','#','#','#','#','#','#','.','#','#','.','#','#','#','#','.','#'},
            {'#','.','#','#','#','#','.','#','#','.','#','#','#','#','#','#','#','#','.','#','#','.','#','#','#','#','.','#'},
            {'#','.','.','.','.','.','.','#','#','.','.','.','.','#','#','.','.','.','.','#','#','.','.','.','.','.','.','#'},
-           {'#','#','#','#','#','#','.','#','#','#','#','#','.','#','#','.','#','#','#','#','#','.','#','#','#','#','#','#'},
-           {'.','.','.','.','.','#','.','#','#','#','#','#','.','#','#','.','#','#','#','#','#','.','#','.','.','.','.','.'},
-           {'.','.','.','.','.','#','.','#','#','.','.','.','.','.','.','.','.','.','.','#','#','.','#','.','.','.','.','.'},
-           {'.','.','.','.','.','#','.','#','#','.','#','#','#','.','.','#','#','#','.','#','#','.','#','.','.','.','.','.'},
-           {'#','#','#','#','#','#','.','#','#','.','#','.','.','.','.','.','.','#','.','#','#','.','#','#','#','#','#','#'},
-           {'.','.','.','.','.','.','.','.','.','.','#','.','.','.','.','.','.','#','.','.','.','.','.','.','.','.','.','.'},
-           {'#','#','#','#','#','#','.','#','#','.','#','.','.','.','.','.','.','#','.','#','#','.','#','#','#','#','#','#'},
-           {'.','.','.','.','.','#','.','#','#','.','#','#','#','#','#','#','#','#','.','#','#','.','#','.','.','.','.','.'},
-           {'.','.','.','.','.','#','.','#','#','.','.','.','.','.','.','.','.','.','.','#','#','.','#','.','.','.','.','.'},
-           {'.','.','.','.','.','#','.','#','#','.','#','#','#','#','#','#','#','#','.','#','#','.','#','.','.','.','.','.'},
-           {'#','#','#','#','#','#','.','#','#','.','#','#','#','#','#','#','#','#','.','#','#','.','#','#','#','#','#','#'},
+           {'#','#','#','#','#','#','.','#','#','#','#','#','_','#','#','_','#','#','#','#','#','.','#','#','#','#','#','#'},
+           {'_','_','_','_','_','#','.','#','#','#','#','#','_','#','#','_','#','#','#','#','#','.','#','_','_','_','_','_'},
+           {'_','_','_','_','_','#','.','#','#','_','_','_','_','_','_','_','_','_','_','#','#','.','#','_','_','_','_','_'},
+           {'_','_','_','_','_','#','.','#','#','_','#','#','#','|','|','#','#','#','_','#','#','.','#','_','_','_','_','_'},
+           {'#','#','#','#','#','#','.','#','#','_','#','_','_','_','_','_','_','#','_','#','#','.','#','#','#','#','#','#'},
+           {'.','.','.','.','.','.','.','_','_','_','#','_','_','_','_','_','_','#','_','_','_','.','.','.','.','.','.','.'},
+           {'#','#','#','#','#','#','.','#','#','_','#','_','_','_','_','_','_','#','_','#','#','.','#','#','#','#','#','#'},
+           {'_','_','_','_','_','#','.','#','#','_','#','#','#','#','#','#','#','#','_','#','#','.','#','_','_','_','_','_'},
+           {'_','_','_','_','_','#','.','#','#','_','_','_','_','_','_','_','_','_','_','#','#','.','#','_','_','_','_','_'},
+           {'_','_','_','_','_','#','.','#','#','_','#','#','#','#','#','#','#','#','_','#','#','.','#','_','_','_','_','_'},
+           {'#','#','#','#','#','#','.','#','#','_','#','#','#','#','#','#','#','#','_','#','#','.','#','#','#','#','#','#'},
            {'#','.','.','.','.','.','.','.','.','.','.','.','.','#','#','.','.','.','.','.','.','.','.','.','.','.','.','#'},
            {'#','.','#','#','#','#','.','#','#','#','#','#','.','#','#','.','#','#','#','#','#','.','#','#','#','#','.','#'},
            {'#','.','#','#','#','#','.','#','#','#','#','#','.','#','#','.','#','#','#','#','#','.','#','#','#','#','.','#'},
-           {'#','.','.','.','#','#','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','#','#','.','.','.','#'},
+           {'#','o','.','.','#','#','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','#','#','.','.','o','#'},
            {'#','#','#','.','#','#','.','#','#','.','#','#','#','#','#','#','#','#','.','#','#','.','#','#','.','#','#','#'},
            {'#','#','#','.','#','#','.','#','#','.','#','#','#','#','#','#','#','#','.','#','#','.','#','#','.','#','#','#'},
            {'#','.','.','.','.','.','.','#','#','.','.','.','.','#','#','.','.','.','.','#','#','.','.','.','.','.','.','#'},
@@ -170,80 +109,190 @@ void initMat (vector <vector<char>> & Mat, unsigned nLevel, CPosition & posPlaye
            {'#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#'},
            };
 
-    Mat[23][13] = kTokenPlayer1;
-    posPlayer1 = CPosition(13,23);
+    posPlayer = CPosition(1,1);
+    Mat[posPlayer.first][posPlayer.second] = KTokenPacman;
+    dirPlayer = CDirection(0,0);
 
-    Mat[20][20] = kTokenPlayer2;
-    posPlayer2 = CPosition(20,20);
+    const vector<string> KGhostTypes {"red","pink","orange","blue"};
+    const vector<unsigned> KGhostCooldowns {1,2,3,4};
+    const vector<char> KGhostTokens {KTokenRedGhost, KTokenPinkGhost, KTokenOrangeGhost, KTokenBlueGhost};
+
+    for (unsigned i = 0; i < 4; ++i) {
+        ghosts.push_back(ghost());
+        ghosts[i].type = KGhostTypes[i];
+        ghosts[i].pos = CPosition(14,12+i);
+        ghosts[i].dir = CDirection(0,0);
+        ghosts[i].cooldown = KGhostCooldowns[i];
+        ghosts[i].token = KGhostTokens[i];
+        Mat[ghosts[i].pos.first][ghosts[i].pos.second] = ghosts[i].token;
+    }
+}
+
+/*
+void addTeleporter (const pair & KCoords1, const pair & KCoords2, const char & KToken)
+{
+    return;
 }
 */
-void moveToken(vector<vector<char>> &Mat, char move, CPosition &pos) {
-    short x = 0, y = 0;
-    char kToken = Mat[pos.second][pos.first];
-    Mat[pos.second][pos.first] = kEmpty;
+
+void movePlayer (vector <vector<char>> & Mat, char move, CPosition & pos,
+                CDirection & dir, unsigned & gumTime)
+{
+    int newY=pos.first, newX=pos.second;
+    const char KToken = Mat[pos.first][pos.second];
+    Mat[pos.first][pos.second] = KEmpty;
 
     switch (move) {
     case 'z':
-        y = -1; // Mouvement vers le haut
+        dir.first = -1;
+        dir.second = 0;
         break;
     case 'q':
-        x = -1; // Mouvement vers la gauche
+        dir.first = 0;
+        dir.second = -1;
         break;
     case 'd':
-        x = 1;  // Mouvement vers la droite
+        dir.first = 0;
+        dir.second = 1;
         break;
     case 's':
-        y = 1;  // Mouvement vers le bas
+        dir.first = 1;
+        dir.second = 0;
+        break;
+    }
+
+    if (newY+dir.first < 0)
+        newY = (newY+dir.first)+Mat.size();
+    else
+        newY = (newY+dir.first)%Mat.size();
+
+    if (newX+dir.second < 0)
+        newX = (newX+dir.second)+Mat[0].size();
+    else
+        newX = (newX+dir.second)%Mat[0].size();
+
+    if (Mat[newY][pos.second] != KWall && Mat[newY][pos.second] != KBarrier)
+        pos.first = newY;
+
+    if (Mat[pos.first][newX] != KWall && Mat[pos.first][newX] != KBarrier)
+        pos.second = newX;
+
+    if (Mat[pos.first][pos.second] == KGum)
+        gumTime = 15;
+
+    Mat[pos.first][pos.second] = KToken;
+}
+
+void moveRandom (vector <vector<char>> & Mat, ghost & gh, unsigned & gumTime)
+{
+    int newY=gh.pos.first, newX=gh.pos.second;
+
+    // On vérifie les chemins disponibles, sauf celui où l'on se retournerait
+    vector<CDirection> choiceDir;
+    if (newY == 0 || (gh.dir.first != 1 && Mat[(newY-1)][gh.pos.second] != KWall
+                      && Mat[(newY-1)][gh.pos.second] != KTokenGhost && Mat[(newY-1)][gh.pos.second] != KBarrier))
+        choiceDir.push_back(CDirection (-1, 0));
+
+    if (newY == Mat.size()-1 || (gh.dir.first != -1 && Mat[newY+1][gh.pos.second] != KWall
+                                   && Mat[newY+1][gh.pos.second] != KTokenGhost && Mat[newY+1][gh.pos.second] != KBarrier))
+        choiceDir.push_back(CDirection (1, 0));
+
+    if (newX == 0 || (gh.dir.second != 1 && Mat[gh.pos.first][newX-1] != KWall
+                      && Mat[gh.pos.first][gh.pos.second-1] != KTokenGhost && Mat[gh.pos.first][gh.pos.second-1] != KBarrier))
+        choiceDir.push_back(CDirection (0, -1));
+
+    if (newX == Mat[0].size()-1 || (gh.dir.second != -1 && Mat[gh.pos.first][newX+1] != KWall
+                                      && Mat[gh.pos.first][gh.pos.second+1] != KTokenGhost && Mat[gh.pos.first][gh.pos.second+1] != KBarrier))
+        choiceDir.push_back(CDirection (0, 1));
+
+    switch (choiceDir.size()){
+    case 0 :
+        gh.dir = CDirection(-1*gh.dir.first,-1*gh.dir.second);
+        break;
+    case 1 :
+        gh.dir = choiceDir[0];
         break;
     default:
-        cout << "Mouvement invalide !" << endl;
-        Mat[pos.second][pos.first] = kToken;
-        return;
+        gh.dir = choiceDir[random()%choiceDir.size()];
+        break;
     }
 
-    if (0 <= (int)(pos.first + x) && pos.first + x < Mat[0].size() &&
-        0 <= (int)(pos.second + y) && pos.second + y < Mat.size() &&
-        Mat[pos.second + y][pos.first + x] != kWall) {
-        pos.first += x;
-        pos.second += y;
-    }
+    if (newY+gh.dir.first < 0)
+        newY = (newY+gh.dir.first)+Mat.size();
+    else
+        newY = (newY+gh.dir.first)%Mat.size();
 
-    Mat[pos.second][pos.first] = kToken;
+    if (newX+gh.dir.second < 0)
+        newX = (newX+gh.dir.second)+Mat[0].size();
+    else
+        newX = (newX+gh.dir.second)%Mat[0].size();
+
+    Mat[gh.pos.first][gh.pos.second] = gh.tokenUnder;
+    gh.tokenUnder = Mat[newY][newX];
+
+    gh.pos.first = newY;
+    gh.pos.second = newX;
+
+    Mat[gh.pos.first][gh.pos.second] = gh.token;
 }
 
 int ppal ()
 {
     // Init grille
     vector <vector<char>> Mat;
-    CPosition posPlayer1, posPlayer2;
+    pacman player;
+    vector <ghost> ghosts;
 
-    initMat(Mat, /*1,*/ posPlayer1, posPlayer2);
-    showMatrix2(Mat);
+    initMat(Mat, 1, player.pos, player.dir, ghosts);
+    showMatrix(Mat);
 
-    while (posPlayer1 != posPlayer2){
+    unsigned gumTime = 0;
+
+    while (player.pos != ghosts[0].pos){
         char input;
 
         cout << "Joueur 1, c'est votre tour!";
+
         cin >> input;
-        moveToken(Mat, input, posPlayer1);
-        showMatrix2(Mat);
+        movePlayer(Mat, input, player.pos, player.dir, gumTime);
+
+        if (gumTime > 0){
+            if (gumTime < 15)
+                movePlayer(Mat, ' ', player.pos, player.dir, gumTime);
+            --gumTime;
+        }
+
+        for (unsigned i = 0; i < ghosts.size(); ++i){
+            if (ghosts[i].cooldown == 0)
+                moveRandom(Mat, ghosts[i], gumTime);
+            else{
+                if (ghosts[i].cooldown == 1){
+                    Mat[ghosts[i].pos.first][ghosts[i].pos.second] = KEmpty;
+                    ghosts[i].pos = CPosition(11,14);
+                    ghosts[i].tokenUnder = Mat[11][14];
+                    Mat[ghosts[i].pos.first][ghosts[i].pos.second] = ghosts[i].token;
+                }
+                ghosts[i].cooldown -= 1;
+                cout << ghosts[i].cooldown;
+            }
+        }
+
+        showMatrix(Mat);
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
     }
-
-    if (posPlayer1 == posPlayer2){
-        cout << "Le joueur " << ((Mat[posPlayer1.second][posPlayer1.first]==kTokenPlayer1) ?
+    /*
+    if (posPlayer1 == posGhost1)
+        cout << "Le joueur " << ((Mat[posPlayer1.first][posPlayer1.second]==KTokenPlayer1) ?
                                      '1' : '2') << " a gagné !" << endl;
-    }
-    else{
+    else
         cout << "Aucun vainqueur...";
-    }
-
+    */
     return 0;
 }
 
-int gameBoard()
+int GameBoard()
 {
-    printCurrentDirectory();
+    srand(time(NULL));
     ppal();
     return 0;
 }
