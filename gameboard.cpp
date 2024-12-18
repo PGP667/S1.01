@@ -290,7 +290,7 @@ int ppal ()
     return 0;
 }
 
-int GameBoard()
+int gameBoard()
 {
     srand(time(NULL));
     ppal();
