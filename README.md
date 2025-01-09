@@ -84,8 +84,10 @@ Pour garantir la qualité du code et documenter nos travaux, nous avons utilisé
 ### Structures
 - **CPosition** : Représente une coordonnée sur la map (ligne, colonne).  
 - **CDirection** : Définit une direction de déplacement (verticale et horizontale).  
-- **Pac-Man** : Contient la position et la direction du joueur.  
-- **Ghost** : Structure définissant le type, la position et les déplacements des fantômes.  
+- **struct pacman** : Contient la position et la direction du joueur.  
+- **Token**: Caractère représentant le fantôme.
+- **TokenUnder** Caractère que le fantôme remplace temporairement lorsqu’il se déplace sur une case.
+- **Cooldown** Compteur qui détermine quand est ce que le fantôme doit se déplacer ou effectuer une action en particulier. 
 
 ### Fonctions
 - **clearScreen()** : Efface le terminal pour un affichage propre.  
