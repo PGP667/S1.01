@@ -12,11 +12,15 @@ struct pacman
 {
     CPosition pos;
     CDirection dir;
+    char move;
+    CDirection nextDir;
+    char nextMove;
 };
 
 struct ghost
 {
     string type;
+    CPosition spawn;
     CPosition pos;
     CDirection dir;
     char token;
@@ -36,7 +40,8 @@ const char KDot                 = '.';
 const char KGum                 = 'o';
 const char KEmpty               = '_';
 
-const unsigned KGumDuration = 12;
+const unsigned KGumDuration = 25;
+const unsigned KCooldownDuration = 25;
 
 const unsigned KReset   (0);
 const unsigned KNoir    (30);
